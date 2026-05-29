@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="LA'KENZY Skincare & Aesthetic Spa — Premium skincare, advanced aesthetics, and luxury spa treatments in Lagos, Nigeria."/>
+  <title>LA'KENZY Skincare &amp; Aesthetic Spa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ===== LOADING SCREEN ===== -->
+  <div id="loader" role="status" aria-label="Loading">
+    <div class="loader-inner">
+      <div class="loader-logo-ring">
+        <div class="loader-spinner"></div>
+        <div class="loader-logo-placeholder">
+          <span class="loader-lk">LK</span>
+        </div>
+      </div>
+      <h1 class="loader-brand">LA'KENZY</h1>
+      <p class="loader-sub">Skincare &amp; Aesthetic Spa</p>
+      <div class="loader-line"></div>
+    </div>
+  </div>
+
+  <!-- ===== WHATSAPP FLOAT ===== -->
+  <a href="https://wa.me/2348039239749" class="whatsapp-float" target="_blank" rel="noopener noreferrer" aria-label="Chat with us on WhatsApp">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+  </a>
+
+  <!-- FIX: Mobile nav overlay added — was missing, taps fell through the nav to content behind -->
+  <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav id="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="#home" class="nav-logo" aria-label="LA'KENZY Home">
+        <div class="logo-circle" aria-hidden="true">
+          <span>LK</span>
+        </div>
+        <div class="logo-text">
+          <span class="logo-name">LA'KENZY</span>
+          <span class="logo-tagline">Skincare &amp; Aesthetic Spa</span>
+        </div>
+      </a>
+      <ul class="nav-links" id="navLinks" role="list">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#marketplace">Marketplace</a></li>
+        <li><a href="#gallery">Gallery</a></li>
+        <li><a href="#testimonials">Testimonials</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#booking" class="nav-cta">Book Appointment</a></li>
+      </ul>
+      <button class="cart-btn" id="cartToggle" aria-label="Open cart" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        <span class="cart-count" id="cartCount" aria-live="polite">0</span>
+      </button>
+      <button class="hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== CART PANEL ===== -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <div class="cart-panel" id="cartPanel" role="dialog" aria-label="Shopping cart" aria-modal="true">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button class="cart-close" id="cartClose" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems"></div>
+    <div class="cart-footer">
+      <div class="cart-total">
+        <span>Total:</span>
+        <span id="cartTotal">₦0</span>
+      </div>
+      <button class="btn-gold cart-checkout" id="cartCheckout">Checkout via WhatsApp</button>
+    </div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section id="home" class="hero">
+    <div class="hero-bg" aria-hidden="true">
+      <div class="hero-overlay"></div>
+      <div class="hero-gradient"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-badge reveal">Premium Aesthetic Spa · Est. Lagos</div>
+      <h1 class="hero-title reveal">
+        Reveal Your<br/>
+        <em>Natural Glow</em>
+      </h1>
+      <p class="hero-sub reveal">Luxury skincare, advanced aesthetics, and premium spa treatments designed for confidence and beauty.</p>
+      <div class="hero-ctas reveal">
+        <a href="#booking" class="btn-gold">Book Appointment</a>
+        <a href="#marketplace" class="btn-outline">Explore Marketplace</a>
+      </div>
+      <div class="hero-stats reveal">
+        <div class="stat"><span class="stat-num">500+</span><span class="stat-label">Happy Clients</span></div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Expert Services</span></div>
+        <div class="stat-divider" aria-hidden="true"></div>
+        <div class="stat"><span class="stat-num">5★</span><span class="stat-label">Rated Spa</span></div>
+      </div>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true">
+      <div class="scroll-dot"></div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT ===== -->
+  <section id="about" class="about section-pad">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-img reveal">
+          <div class="about-img-frame">
+            <div class="img-placeholder about-ph">
+              <span>LA'KENZY</span>
+              <small>Professional Photo</small>
+            </div>
+            <div class="about-badge-card">
+              <span class="badge-num">5+</span>
+              <span class="badge-text">Years of Excellence</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-text reveal">
+          <p class="section-eyebrow">Who We Are</p>
+          <h2 class="section-title">Beauty Is Our <em>Craft</em></h2>
+          <p class="about-lead">At LA'KENZY Skincare &amp; GlowSpa, we believe every skin tells a story. Our mission is to help yours glow with confidence and radiance.</p>
+          <p class="about-body">Nestled in Omu-Arogun, Lagos, our premium spa blends cutting-edge aesthetic science with deeply nourishing skincare rituals. From advanced chemical peels to bespoke facials, every treatment is tailored to your unique skin journey.</p>
+          <p class="about-body">Our certified aestheticians bring passion, precision, and luxury to every session — ensuring you leave not just beautiful, but deeply cared for.</p>
+          <div class="about-pillars">
+            <div class="pillar"><div class="pillar-icon" aria-hidden="true">✦</div><span>Expert-Led Treatments</span></div>
+            <div class="pillar"><div class="pillar-icon" aria-hidden="true">✦</div><span>Premium Products</span></div>
+            <div class="pillar"><div class="pillar-icon" aria-hidden="true">✦</div><span>Personalized Care</span></div>
+          </div>
+          <a href="#booking" class="btn-gold">Book a Consultation</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SERVICES ===== -->
+  <section id="services" class="services section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">What We Offer</p>
+        <h2 class="section-title">Our Premium <em>Services</em></h2>
+        <p class="section-desc">From transformative skin treatments to total body wellness, we offer a complete luxury beauty experience.</p>
+      </div>
+      <div class="services-grid" id="servicesGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== MARKETPLACE ===== -->
+  <section id="marketplace" class="marketplace section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Shop With Us</p>
+        <h2 class="section-title">Skincare <em>Marketplace</em></h2>
+        <p class="section-desc">Premium skincare products curated by our experts, delivered to your door.</p>
+      </div>
+      <div class="market-controls reveal">
+        <div class="market-search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <!-- FIX: added id and aria-label for accessibility -->
+          <input type="search" id="productSearch" placeholder="Search products..." aria-label="Search products"/>
+        </div>
+        <div class="market-filters" id="marketFilters" role="group" aria-label="Filter by category"></div>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== BOOKING ===== -->
+  <section id="booking" class="booking section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Reserve Your Session</p>
+        <h2 class="section-title">Book an <em>Appointment</em></h2>
+        <p class="section-desc">Select your preferred service and time. We'll confirm within 24 hours.</p>
+      </div>
+      <div class="booking-card reveal">
+        <form id="bookingForm" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bName">Full Name *</label>
+              <input type="text" id="bName" name="fullName" placeholder="Your full name" required autocomplete="name"/>
+            </div>
+            <div class="form-group">
+              <label for="bPhone">Phone Number *</label>
+              <input type="tel" id="bPhone" name="phone" placeholder="e.g. 08039239749" required autocomplete="tel"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bEmail">Email Address</label>
+              <input type="email" id="bEmail" name="email" placeholder="your@email.com" autocomplete="email"/>
+            </div>
+            <div class="form-group">
+              <label for="bService">Select Service *</label>
+              <select id="bService" name="service" required>
+                <option value="">— Choose a Service —</option>
+                <option value="Skin Analysis">Skin Analysis</option>
+                <option value="Skin Treatment">Skin Treatment</option>
+                <option value="Full Body Massage">Full Body Massage</option>
+                <option value="Facials">Facials</option>
+                <option value="Chemical Peels">Chemical Peels</option>
+                <option value="Mesotherapy">Mesotherapy</option>
+                <option value="IV Therapy">IV Therapy</option>
+                <option value="Teeth Whitening">Teeth Whitening</option>
+                <option value="Pedicure &amp; Manicure">Pedicure &amp; Manicure</option>
+                <option value="Waxing">Waxing</option>
+                <option value="Body Scrub">Body Scrub</option>
+                <option value="Body Steaming">Body Steaming</option>
+                <option value="Vagina Treatment">Vagina Treatment</option>
+                <option value="Lash Extension">Lash Extension</option>
+                <option value="Microblading">Microblading</option>
+                <option value="Stretch Mark Treatment">Stretch Mark Treatment</option>
+                <option value="Skintag Removal">Skintag Removal</option>
+                <option value="Consultation">Consultation</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="bDate">Preferred Date *</label>
+              <input type="date" id="bDate" name="date" required/>
+            </div>
+            <div class="form-group">
+              <label for="bTime">Preferred Time *</label>
+              <select id="bTime" name="time" required>
+                <option value="">— Select Time —</option>
+                <option value="09:00 AM">09:00 AM</option>
+                <option value="10:00 AM">10:00 AM</option>
+                <option value="11:00 AM">11:00 AM</option>
+                <option value="12:00 PM">12:00 PM</option>
+                <option value="01:00 PM">01:00 PM</option>
+                <option value="02:00 PM">02:00 PM</option>
+                <option value="03:00 PM">03:00 PM</option>
+                <option value="04:00 PM">04:00 PM</option>
+                <option value="05:00 PM">05:00 PM</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group full">
+            <label for="bNotes">Additional Notes</label>
+            <textarea id="bNotes" name="notes" rows="3" placeholder="Any special requests or skin concerns..."></textarea>
+          </div>
+          <button type="submit" class="btn-gold btn-full" id="bookBtn">
+            <span>Confirm Appointment</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Modal -->
+  <div class="modal-overlay" id="bookingModal" role="dialog" aria-modal="true" aria-labelledby="modalHeading">
+    <div class="modal-card">
+      <div class="modal-icon" aria-hidden="true">✦</div>
+      <h3 id="modalHeading">Booking Confirmed!</h3>
+      <p>Your appointment has been received. We'll contact you shortly to confirm.</p>
+      <div class="modal-ref" id="modalRef" aria-live="polite"></div>
+      <button class="btn-gold" id="modalClose">Done</button>
+    </div>
+  </div>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section id="testimonials" class="testimonials section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Client Love</p>
+        <h2 class="section-title">What They <em>Say</em></h2>
+      </div>
+      <div class="testi-slider-wrap">
+        <div class="testi-slider" id="testiSlider" role="list"></div>
+        <div class="testi-dots" id="testiDots" role="tablist" aria-label="Testimonial navigation"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GALLERY ===== -->
+  <section id="gallery" class="gallery section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Our Work</p>
+        <h2 class="section-title">Beauty <em>Gallery</em></h2>
+        <p class="section-desc">Transformations, treatments, and results that speak for themselves.</p>
+      </div>
+      <div class="gallery-grid" id="galleryGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section id="contact" class="contact section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Get In Touch</p>
+        <h2 class="section-title">Contact <em>Us</em></h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info reveal">
+          <div class="contact-card glass-card">
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">📍</div>
+              <div>
+                <strong>Location</strong>
+                <p>Omu-Arogun Bus-Stop, Lagos</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">📞</div>
+              <div>
+                <strong>Phone</strong>
+                <p><a href="tel:+2348039239749">08039239749</a></p>
+                <p><a href="tel:+2349053563695">09053563695</a></p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">🌐</div>
+              <div>
+                <strong>Website</strong>
+                <p><a href="https://www.lakenzyorganics.com.ng" target="_blank" rel="noopener noreferrer">lakenzyorganics.com.ng</a></p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon" aria-hidden="true">📸</div>
+              <div>
+                <strong>Instagram</strong>
+                <p><a href="https://instagram.com/lakenzyorganics" target="_blank" rel="noopener noreferrer">@lakenzyorganics</a></p>
+              </div>
+            </div>
+            <div class="contact-socials">
+              <a href="https://wa.me/2348039239749" class="social-btn wa" target="_blank" rel="noopener noreferrer">WhatsApp Us</a>
+              <a href="https://instagram.com/lakenzyorganics" class="social-btn ig" target="_blank" rel="noopener noreferrer">Instagram</a>
+            </div>
+          </div>
+          <div class="map-placeholder">
+            <span>📍 Omu-Arogun Bus-Stop, Lagos</span>
+            <small>Google Maps Integration Ready</small>
+          </div>
+        </div>
+        <div class="contact-form reveal">
+          <!-- FIX: form element wraps the glass-card so the submit works correctly -->
+          <form id="contactForm" class="glass-card" novalidate>
+            <div class="form-group">
+              <label for="cName">Your Name</label>
+              <input type="text" id="cName" name="name" placeholder="Full name" required autocomplete="name"/>
+            </div>
+            <div class="form-group">
+              <label for="cEmail">Email</label>
+              <input type="email" id="cEmail" name="email" placeholder="your@email.com" required autocomplete="email"/>
+            </div>
+            <div class="form-group">
+              <label for="cMessage">Message</label>
+              <textarea id="cMessage" name="message" rows="5" placeholder="How can we help you?" required></textarea>
+            </div>
+            <button type="submit" class="btn-gold btn-full">Send Message</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-top">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="footer-logo">
+              <div class="logo-circle small" aria-hidden="true">LK</div>
+              <div>
+                <span class="logo-name">LA'KENZY</span>
+                <span class="logo-tagline">Skincare &amp; Aesthetic Spa</span>
+              </div>
+            </div>
+            <p class="footer-bio">Premium skincare and aesthetic treatments designed to reveal your natural glow. Located in the heart of Lagos.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Quick Links</h4>
+            <ul>
+              <li><a href="#home">Home</a></li>
+              <li><a href="#about">About</a></li>
+              <li><a href="#services">Services</a></li>
+              <li><a href="#marketplace">Marketplace</a></li>
+              <li><a href="#gallery">Gallery</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Services</h4>
+            <ul>
+              <li><a href="#booking">Skin Analysis</a></li>
+              <li><a href="#booking">Facials</a></li>
+              <li><a href="#booking">Chemical Peels</a></li>
+              <li><a href="#booking">Mesotherapy</a></li>
+              <li><a href="#booking">Teeth Whitening</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Contact</h4>
+            <p>Omu-Arogun Bus-Stop, Lagos</p>
+            <p><a href="tel:+2348039239749">08039239749</a></p>
+            <p><a href="tel:+2349053563695">09053563695</a></p>
+            <p><a href="https://instagram.com/lakenzyorganics" target="_blank" rel="noopener noreferrer">@lakenzyorganics</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="footer-divider"></div>
+        <p>© 2026 LA'KENZY Skincare &amp; Aesthetic Spa. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
