@@ -1554,3 +1554,88 @@ section, .container, .nav-container, footer, .footer-top, .footer-bottom {
   /* Sidebar open button: hide label on very small screens if any */
   .sidebar-open-btn { width: 34px; height: 34px; font-size: 0.8rem; }
 }
+
+/* =============================================
+   PRODUCT GRID OVERHAUL — 2 columns, full width
+   ============================================= */
+
+/* Marketplace & featured: always 2 columns, full container width */
+.products-grid,
+.featured-products-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 1.2rem !important;
+  width: 100% !important;
+}
+
+/* Product card — compact, not too tall */
+.product-card {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch;
+  gap: 0;
+  min-height: unset !important;
+  height: auto !important;
+}
+
+.product-img {
+  width: 90px !important;
+  min-width: 90px !important;
+  height: auto !important;
+  aspect-ratio: unset !important;
+  border-radius: 12px 0 0 12px !important;
+  flex-shrink: 0;
+}
+
+.product-body {
+  flex: 1;
+  padding: 0.85rem !important;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.product-name {
+  font-size: 0.82rem !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.product-category { font-size: 0.65rem !important; }
+.product-desc { font-size: 0.7rem !important; -webkit-line-clamp: 2; display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.product-price { font-size: 0.85rem !important; margin-bottom: 0.5rem !important; }
+
+.product-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.qty-selector button { width: 22px !important; height: 22px !important; font-size: 0.75rem !important; }
+.qty-selector span { font-size: 0.75rem !important; min-width: 18px !important; }
+.add-cart-btn { font-size: 0.7rem !important; padding: 0.3rem 0.6rem !important; }
+
+/* Hide featured section by default — JS shows it when products exist */
+#featured-products { display: none; }
+
+/* Marketplace section full width */
+.marketplace .container { max-width: 100% !important; padding: 0 1.5rem !important; }
+
+/* Mobile: stack to 1 column on very small screens */
+@media (max-width: 480px) {
+  .products-grid,
+  .featured-products-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .product-card {
+    flex-direction: column !important;
+  }
+  .product-img {
+    width: 100% !important;
+    min-width: unset !important;
+    height: 80px !important;
+    border-radius: 12px 12px 0 0 !important;
+  }
+}
