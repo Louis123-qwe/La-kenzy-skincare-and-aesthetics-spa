@@ -52,13 +52,15 @@ input, select, textarea { font-family: inherit; }
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
+  gap: 0;
 }
 
 .loader-logo-ring {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 2rem;
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 1.6rem;
   position: relative;
 }
 .loader-spinner {
@@ -671,8 +673,22 @@ input, select, textarea { font-family: inherit; }
 .service-body { padding: 1.2rem; display: flex; flex-direction: column; flex: 1; }
 .service-name { font-family: 'Playfair Display', serif; font-size: 1rem; color: var(--cream); margin-bottom: 0.4rem; }
 .service-desc { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.8rem; line-height: 1.6; flex: 1; }
-.service-footer { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-top: auto; }
-.service-price { font-size: 0.82rem; color: var(--gold); font-weight: 500; }
+.service-footer { display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; margin-top: auto; flex-wrap: wrap; }
+.service-enquire-btn {
+  font-size: 0.72rem;
+  background: transparent;
+  color: #25D366;
+  border: 1px solid #25D366;
+  padding: 0.35rem 0.9rem;
+  border-radius: 30px;
+  transition: background var(--transition), color var(--transition);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.service-enquire-btn:hover { background: #25D366; color: #fff; }
 .service-book {
   font-size: 0.72rem;
   background: var(--gold-dim);
