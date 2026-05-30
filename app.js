@@ -1,6 +1,6 @@
 /* =============================================
    LA'KENZY SKINCARE & AESTHETIC SPA
-   app.js — Updated: Firebase-first products, FA icons, featured products, sidebar marketplace
+   app.js — Firebase-first: products, services, testimonials
    ============================================= */
 
 // ===== FIREBASE CONFIG =====
@@ -27,40 +27,47 @@ try {
   console.warn("Firebase not configured yet. Running in demo mode.");
 }
 
-// ===== SERVICES DATA (no emojis — use Font Awesome icon classes) =====
-const SERVICES = [
-  { name: "Skin Analysis",        icon: "fas fa-microscope",        desc: "Advanced skin assessment using professional diagnostic tools to identify your unique skin type and concerns.", price: "₦5,000" },
-  { name: "Skin Treatment",       icon: "fas fa-spa",               desc: "Targeted treatment protocols customised to address hyperpigmentation, acne, and uneven texture.", price: "₦15,000" },
-  { name: "Full Body Massage",    icon: "fas fa-hand-holding-heart", desc: "Deeply relaxing full-body massage using premium aromatherapy oils for total mind-body renewal.", price: "₦20,000" },
-  { name: "Facials",              icon: "fas fa-face-smile-beam",   desc: "Luxurious facial treatments tailored for deep cleansing, hydration, and natural radiance.", price: "₦12,000" },
-  { name: "Chemical Peels",       icon: "fas fa-flask",             desc: "Professional-grade peels that resurface skin, reduce dark spots, and reveal a brighter complexion.", price: "₦18,000" },
-  { name: "Mesotherapy",          icon: "fas fa-syringe",           desc: "Micro-injections of vitamins and nutrients directly into the skin for intense rejuvenation.", price: "₦25,000" },
-  { name: "Teeth Whitening",      icon: "fas fa-teeth-open",        desc: "Advanced LED whitening treatment for a dazzling, confident smile in just one session.", price: "₦15,000" },
-  { name: "Pedicure & Manicure",  icon: "fas fa-hand-sparkles",     desc: "Premium nail care ritual with exfoliation, cuticle treatment, and long-lasting polish.", price: "₦8,000" },
-  { name: "Waxing",               icon: "fas fa-leaf",              desc: "Gentle, long-lasting hair removal using premium warm wax for silky smooth skin.", price: "₦5,000" },
-  { name: "Lash Extension",       icon: "fas fa-eye",               desc: "Individually applied premium silk lashes for dramatic, fluttery eyes that last weeks.", price: "₦20,000" },
-  { name: "Microblading",         icon: "fas fa-paint-brush",       desc: "Semi-permanent brow technique that creates natural, hair-like strokes for perfectly shaped brows.", price: "₦35,000" },
-  { name: "Stretch Mark Treatment", icon: "fas fa-star-of-life",    desc: "Advanced combination therapy to visibly reduce the appearance of stretch marks and scars.", price: "₦22,000" },
+// ===== FALLBACK SERVICES (from banner — no prices) =====
+const FALLBACK_SERVICES = [
+  { name: "Skin Analysis",                   icon: "fas fa-microscope",         desc: "Advanced skin assessment to identify your unique skin type, concerns, and the best treatment path for you." },
+  { name: "Skin Care Products",              icon: "fas fa-bottle-droplet",      desc: "Premium curated skincare products selected by our experts to complement your personal skin journey." },
+  { name: "Skin Treatment",                  icon: "fas fa-spa",                 desc: "Targeted protocols to address hyperpigmentation, acne, uneven texture, and other skin concerns." },
+  { name: "Full Body Massage",               icon: "fas fa-hand-holding-heart",  desc: "Deeply relaxing full-body massage using premium aromatherapy oils for total mind-body renewal." },
+  { name: "Facials",                         icon: "fas fa-face-smile-beam",     desc: "Luxurious facial treatments tailored for deep cleansing, hydration, and natural radiance." },
+  { name: "Chemical Peels",                  icon: "fas fa-flask",               desc: "Professional-grade peels that resurface skin, reduce dark spots, and reveal a brighter complexion." },
+  { name: "Mesotherapy",                     icon: "fas fa-syringe",             desc: "Micro-injections of vitamins and nutrients directly into the skin for intense rejuvenation." },
+  { name: "IV Therapy",                      icon: "fas fa-heart-pulse",         desc: "Intravenous vitamin and nutrient infusions for deep cellular nourishment and whole-body wellness." },
+  { name: "Waxing",                          icon: "fas fa-leaf",                desc: "Gentle, long-lasting hair removal using premium warm wax for silky smooth skin." },
+  { name: "Body Scrub",                      icon: "fas fa-sparkles",            desc: "Exfoliating full-body scrub treatment to slough away dead skin and reveal soft, glowing skin beneath." },
+  { name: "Body Steaming",                   icon: "fas fa-cloud",               desc: "Therapeutic steam treatment that opens pores, detoxifies the skin, and promotes deep relaxation." },
+  { name: "Vagina Treatment",                icon: "fas fa-venus",               desc: "Specialised intimate care and wellness treatment performed with discretion and professional care." },
+  { name: "Pedicure & Manicure",             icon: "fas fa-hand-sparkles",       desc: "Premium nail care ritual with exfoliation, cuticle treatment, and long-lasting polish." },
+  { name: "Consultation",                    icon: "fas fa-comments",            desc: "One-on-one session with our expert aestheticians to build a personalised skincare or treatment plan." },
+  { name: "Skintag Removal",                 icon: "fas fa-star-of-life",        desc: "Safe, precise removal of skin tags using advanced techniques with minimal discomfort." },
+  { name: "Lash Extension",                  icon: "fas fa-eye",                 desc: "Individually applied premium silk lashes for dramatic, fluttery eyes that last weeks." },
+  { name: "Microblading",                    icon: "fas fa-paint-brush",         desc: "Semi-permanent brow technique that creates natural, hair-like strokes for perfectly shaped brows." },
+  { name: "Teeth Whitening",                 icon: "fas fa-teeth-open",          desc: "Advanced LED whitening treatment for a dazzling, confident smile in just one session." },
+  { name: "Stretch Mark Camouflage Treatment", icon: "fas fa-wand-magic-sparkles", desc: "Advanced combination therapy to visibly camouflage and reduce the appearance of stretch marks." },
 ];
 
-// ===== DEMO PRODUCTS — only shown when Firebase has NO products collection =====
-const DEMO_PRODUCTS = [
-  { id: "p1", name: "Glow Serum 30ml",      category: "Serums",       price: 12500, icon: "fas fa-star", desc: "Vitamin C brightening serum" },
-  { id: "p2", name: "Deep Hydration Cream", category: "Moisturisers", price: 9500,  icon: "fas fa-droplet", desc: "24hr moisture barrier cream" },
-  { id: "p3", name: "Exfoliating Toner",    category: "Toners",       price: 7500,  icon: "fas fa-leaf", desc: "AHA/BHA gentle exfoliant" },
-  { id: "p4", name: "SPF50 Sunscreen",      category: "SPF",          price: 8500,  icon: "fas fa-sun", desc: "Broad spectrum protection" },
-  { id: "p5", name: "Cleansing Oil",        category: "Cleansers",    price: 6500,  icon: "fas fa-soap", desc: "Gentle makeup dissolving oil" },
-  { id: "p6", name: "Retinol Night Cream",  category: "Moisturisers", price: 14500, icon: "fas fa-moon", desc: "Anti-ageing overnight repair" },
-  { id: "p7", name: "Kojic Acid Soap",      category: "Cleansers",    price: 3500,  icon: "fas fa-bars-staggered", desc: "Brightening complexion bar" },
-  { id: "p8", name: "Hyaluronic Essence",   category: "Serums",       price: 11000, icon: "fas fa-gem", desc: "Plumping hydration booster" },
-];
-
-const TESTIMONIALS = [
+const FALLBACK_TESTIMONIALS = [
   { name: "Adaeze Okonkwo",  location: "Victoria Island, Lagos", stars: 5, text: "LA'KENZY completely transformed my skin. After years of struggling with hyperpigmentation, my skin has never looked more even and glowing. The team is incredibly professional and caring." },
   { name: "Fatima Abdullahi",location: "Abuja",                  stars: 5, text: "I drove all the way from Abuja and it was absolutely worth it. The mesotherapy session was painless and I noticed a visible difference within a week. My friends keep asking what I'm doing!" },
   { name: "Chidinma Eze",    location: "Lekki, Lagos",           stars: 5, text: "The facials here are absolutely divine. You can tell they use premium products and the estheticians truly understand melanin skin. My go-to spa in Lagos." },
   { name: "Blessing Nwosu",  location: "Port Harcourt",          stars: 5, text: "Had my microblading done here and I get compliments every single day. So natural looking! The attention to detail is unmatched. I won't go anywhere else." },
   { name: "Kemi Olatunji",   location: "Surulere, Lagos",        stars: 5, text: "The teeth whitening results were instant and stunning. The environment is so luxurious and clean. Booking is so easy and the team always follows up. 10/10 experience!" },
+];
+
+// ===== DEMO PRODUCTS — only shown when Firebase has NO products collection =====
+const DEMO_PRODUCTS = [
+  { id: "p1", name: "Glow Serum 30ml",      category: "Serums",       price: 12500, icon: "fas fa-star",           desc: "Vitamin C brightening serum" },
+  { id: "p2", name: "Deep Hydration Cream", category: "Moisturisers", price: 9500,  icon: "fas fa-droplet",        desc: "24hr moisture barrier cream" },
+  { id: "p3", name: "Exfoliating Toner",    category: "Toners",       price: 7500,  icon: "fas fa-leaf",           desc: "AHA/BHA gentle exfoliant" },
+  { id: "p4", name: "SPF50 Sunscreen",      category: "SPF",          price: 8500,  icon: "fas fa-sun",            desc: "Broad spectrum protection" },
+  { id: "p5", name: "Cleansing Oil",        category: "Cleansers",    price: 6500,  icon: "fas fa-soap",           desc: "Gentle makeup dissolving oil" },
+  { id: "p6", name: "Retinol Night Cream",  category: "Moisturisers", price: 14500, icon: "fas fa-moon",           desc: "Anti-ageing overnight repair" },
+  { id: "p7", name: "Kojic Acid Soap",      category: "Cleansers",    price: 3500,  icon: "fas fa-bars-staggered", desc: "Brightening complexion bar" },
+  { id: "p8", name: "Hyaluronic Essence",   category: "Serums",       price: 11000, icon: "fas fa-gem",            desc: "Plumping hydration booster" },
 ];
 
 const GALLERY_ITEMS = [
@@ -74,11 +81,11 @@ const GALLERY_ITEMS = [
   { label: "Manicure & Pedi",   tag: "Nails",                        icon: "fas fa-hand-sparkles" },
 ];
 
-// ===== LIVE PRODUCTS STATE =====
-let PRODUCTS = []; // populated from Firebase or demo fallback
-let firebaseProductsLoaded = false;
+// ===== LIVE STATE =====
+let PRODUCTS = [];
+let SERVICES = [];
+let TESTIMONIALS = [];
 
-// ===== CART STATE =====
 let cart = [];
 try { cart = JSON.parse(localStorage.getItem("lk_cart") || "[]"); } catch (e) { cart = []; }
 
@@ -87,6 +94,8 @@ let testiIndex = 0;
 let testiAutoplay;
 let testiMouseEnterHandler = null;
 let testiMouseLeaveHandler = null;
+
+const WHATSAPP_NUMBER = "2348039239749";
 
 // ===== UTILITIES =====
 function showToast(msg, type = "success") {
@@ -109,6 +118,10 @@ function saveCart() {
   document.getElementById("cartCount").textContent = count;
   const btn = document.getElementById("cartToggle");
   if (btn) btn.setAttribute("aria-label", count > 0 ? `Open cart (${count} items)` : "Open cart");
+}
+
+function openWhatsApp(message) {
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
 }
 
 // ===== LOADER =====
@@ -193,23 +206,33 @@ function initReveal() {
 // ===== SERVICES =====
 function renderServices() {
   const grid = document.getElementById("servicesGrid");
+  if (!grid) return;
   grid.innerHTML = SERVICES.map((s, i) => `
     <article class="service-card reveal" style="transition-delay:${i * 40}ms">
       <div class="service-img" aria-hidden="true">
-        <i class="${s.icon}"></i>
+        <i class="${s.icon || 'fas fa-spa'}"></i>
       </div>
       <div class="service-body">
         <h3 class="service-name">${s.name}</h3>
-        <p class="service-desc">${s.desc}</p>
+        <p class="service-desc">${s.desc || s.description || ""}</p>
         <div class="service-footer">
-          <span class="service-price">From ${s.price}</span>
-          <button class="service-book" onclick="scrollToBooking('${s.name.replace(/'/g, "\\'")}')">Book Now</button>
+          <button class="service-enquire-btn" onclick="enquireService('${s.name.replace(/'/g, "\\'")}')">
+            <i class="fab fa-whatsapp"></i> Enquire
+          </button>
+          <button class="service-book" onclick="scrollToBooking('${s.name.replace(/'/g, "\\'")}')">
+            Book Request
+          </button>
         </div>
       </div>
     </article>
   `).join("");
   initReveal();
 }
+
+window.enquireService = function(serviceName) {
+  const msg = `Hello LA'KENZY! 👋\n\nI'm interested in the *${serviceName}* service and would like to know more.\n\nPlease provide details on availability and pricing. Thank you!`;
+  openWhatsApp(msg);
+};
 
 window.scrollToBooking = function(service) {
   const sel = document.getElementById("bService");
@@ -220,11 +243,44 @@ window.scrollToBooking = function(service) {
   document.getElementById("booking").scrollIntoView({ behavior: "smooth" });
 };
 
-// ===== FIREBASE PRODUCTS LOADER =====
+// ===== FIREBASE LOADERS =====
+async function loadServicesFromFirebase() {
+  if (!db) { SERVICES = FALLBACK_SERVICES; renderServices(); populateBookingServiceOptions(); return; }
+  try {
+    onSnapshot(collection(db, "services"), (snapshot) => {
+      SERVICES = snapshot.empty
+        ? FALLBACK_SERVICES
+        : snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderServices();
+      populateBookingServiceOptions();
+    });
+  } catch (e) {
+    console.warn("Could not load services from Firebase:", e);
+    SERVICES = FALLBACK_SERVICES;
+    renderServices();
+    populateBookingServiceOptions();
+  }
+}
+
+async function loadTestimonialsFromFirebase() {
+  if (!db) { TESTIMONIALS = FALLBACK_TESTIMONIALS; renderTestimonials(); return; }
+  try {
+    onSnapshot(collection(db, "testimonials"), (snapshot) => {
+      TESTIMONIALS = snapshot.empty
+        ? FALLBACK_TESTIMONIALS
+        : snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderTestimonials();
+    });
+  } catch (e) {
+    console.warn("Could not load testimonials from Firebase:", e);
+    TESTIMONIALS = FALLBACK_TESTIMONIALS;
+    renderTestimonials();
+  }
+}
+
 async function loadProductsFromFirebase() {
   if (!db) return;
   try {
-    // Real-time listener — handles initial load + future changes instantly
     onSnapshot(collection(db, "products"), (snapshot) => {
       PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const searchVal = document.getElementById("productSearch")?.value || "";
@@ -238,9 +294,18 @@ async function loadProductsFromFirebase() {
   }
 }
 
+// ===== BOOKING DROPDOWN =====
+function populateBookingServiceOptions() {
+  const sel = document.getElementById("bService");
+  if (!sel || SERVICES.length === 0) return;
+  const current = sel.value;
+  sel.innerHTML = `<option value="">— Choose a Service —</option>` +
+    SERVICES.map(s => `<option value="${s.name}">${s.name}</option>`).join("");
+  if (current) sel.value = current;
+}
+
 // ===== PRODUCT ICON HELPER =====
 function getProductIcon(product) {
-  // Firebase products may have an `icon` field (FA class) or `image` (URL)
   if (product.image) return `<img src="${product.image}" alt="${product.name}" loading="lazy" />`;
   const iconClass = product.icon || "fas fa-bottle-droplet";
   return `<i class="${iconClass}"></i>`;
@@ -301,24 +366,18 @@ function renderProducts(queryStr = "") {
   initReveal();
 }
 
-// ===== FEATURED PRODUCTS (Home — top 4 only, hidden when no products) =====
 function renderFeaturedProducts() {
   const grid = document.getElementById("featuredProductsGrid");
   const section = document.getElementById("featured-products");
   if (!grid) return;
 
   if (PRODUCTS.length === 0) {
-    if (section) section.style.display = "none"; // hide entire section — no demo bleed
+    if (section) section.style.display = "none";
     return;
   }
-  if (section) section.style.display = ""; // show once products exist
+  if (section) section.style.display = "";
 
   const featured = PRODUCTS.slice(0, 4);
-  if (featured.length === 0) {
-    grid.innerHTML = "";
-    return;
-  }
-
   grid.innerHTML = featured.map(p => `
     <article class="product-card reveal">
       <div class="product-img" aria-hidden="true">${getProductIcon(p)}</div>
@@ -341,16 +400,13 @@ function renderFeaturedProducts() {
   initReveal();
 }
 
-// ===== SIDEBAR PRODUCTS =====
 function renderSidebarProducts() {
   const list = document.getElementById("sidebarProductsList");
   if (!list) return;
-
   if (PRODUCTS.length === 0) {
     list.innerHTML = `<p class="sidebar-empty">No products yet.</p>`;
     return;
   }
-
   list.innerHTML = PRODUCTS.map(p => `
     <div class="sidebar-product-item">
       <div class="sidebar-product-icon">${getProductIcon(p)}</div>
@@ -450,11 +506,11 @@ window.removeFromCart = function(id) {
 };
 
 function initCart() {
-  const toggle = document.getElementById("cartToggle");
-  const close  = document.getElementById("cartClose");
-  const overlay= document.getElementById("cartOverlay");
-  const panel  = document.getElementById("cartPanel");
-  const checkout=document.getElementById("cartCheckout");
+  const toggle   = document.getElementById("cartToggle");
+  const close    = document.getElementById("cartClose");
+  const overlay  = document.getElementById("cartOverlay");
+  const panel    = document.getElementById("cartPanel");
+  const checkout = document.getElementById("cartCheckout");
 
   const openCart  = () => { panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; toggle.setAttribute("aria-expanded", "true"); };
   const closeCart = () => { panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; toggle.setAttribute("aria-expanded", "false"); };
@@ -468,8 +524,8 @@ function initCart() {
     if (cart.length === 0) { showToast("Your cart is empty", "error"); return; }
     const lines = cart.map(i => `• ${i.name} x${i.qty} — ${formatPrice(i.price * i.qty)}`).join("\n");
     const total = formatPrice(cart.reduce((s, i) => s + i.price * i.qty, 0));
-    const msg = encodeURIComponent(`Hello LA'KENZY! 🌟\n\nI'd like to order:\n${lines}\n\n*Total: ${total}*\n\nPlease confirm availability. Thank you!`);
-    window.open(`https://wa.me/2348039239749?text=${msg}`, "_blank", "noopener,noreferrer");
+    const msg = `Hello LA'KENZY! 🌟\n\nI'd like to order:\n${lines}\n\n*Total: ${total}*\n\nPlease confirm availability. Thank you!`;
+    openWhatsApp(msg);
   });
 
   saveCart(); renderCart();
@@ -477,10 +533,10 @@ function initCart() {
 
 // ===== SIDEBAR TOGGLE =====
 function initSidebar() {
-  const sidebar    = document.getElementById("productSidebar");
-  const openBtn    = document.getElementById("sidebarOpen");
-  const closeBtn   = document.getElementById("sidebarClose");
-  const overlay    = document.getElementById("sidebarOverlay");
+  const sidebar  = document.getElementById("productSidebar");
+  const openBtn  = document.getElementById("sidebarOpen");
+  const closeBtn = document.getElementById("sidebarClose");
+  const overlay  = document.getElementById("sidebarOverlay");
 
   if (!sidebar || !openBtn) return;
 
@@ -493,15 +549,18 @@ function initSidebar() {
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && sidebar.classList.contains("open")) closeSidebar(); });
 }
 
-// ===== BOOKING =====
+// ===== BOOKING — request form, admin confirms via WhatsApp =====
 function initBooking() {
-  const form = document.getElementById("bookingForm");
-  const modal = document.getElementById("bookingModal");
+  const form       = document.getElementById("bookingForm");
+  const modal      = document.getElementById("bookingModal");
   const modalClose = document.getElementById("modalClose");
-  const modalRef = document.getElementById("modalRef");
+  const modalRef   = document.getElementById("modalRef");
 
   const dateInput = document.getElementById("bDate");
-  if (dateInput) { const today = new Date().toISOString().split("T")[0]; dateInput.min = today; }
+  if (dateInput) {
+    const today = new Date().toISOString().split("T")[0];
+    dateInput.min = today;
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -515,62 +574,69 @@ function initBooking() {
     const email   = document.getElementById("bEmail").value.trim();
     const notes   = document.getElementById("bNotes").value.trim();
 
-    if (!name || !phone || !service || !date || !time) { showToast("Please fill in all required fields", "error"); return; }
-    if (phone.replace(/\D/g, "").length < 10) { showToast("Please enter a valid phone number", "error"); return; }
+    if (!name || !phone || !service || !date || !time) {
+      showToast("Please fill in all required fields", "error");
+      return;
+    }
+    if (phone.replace(/\D/g, "").length < 10) {
+      showToast("Please enter a valid phone number", "error");
+      return;
+    }
 
     btn.disabled = true;
-    btn.innerHTML = "<span>Processing...</span>";
+    btn.innerHTML = "<span>Submitting Request...</span>";
 
     const ref = generateRef();
-    const appointment = { name, phone, email, service, date, time, notes, ref, createdAt: new Date().toISOString() };
+    const appointment = { name, phone, email, service, date, time, notes, ref, status: "pending" };
 
     try {
       if (db) {
-        const q = query(collection(db, "appointments"), where("date", "==", date), where("time", "==", time), where("service", "==", service));
-        const snap = await getDocs(q);
-        if (!snap.empty) {
-          showToast("This slot is already booked. Please choose another time.", "error");
-          btn.disabled = false;
-          btn.innerHTML = "<span>Confirm Appointment</span>";
-          return;
-        }
-        await addDoc(collection(db, "appointments"), { ...appointment, createdAt: serverTimestamp() });
+        await addDoc(collection(db, "appointments"), {
+          ...appointment,
+          createdAt: serverTimestamp()
+        });
       } else {
         await new Promise(r => setTimeout(r, 1200));
       }
 
       form.reset();
-      modalRef.textContent = `Booking Reference: ${ref}`;
+      modalRef.textContent = `Request Reference: ${ref}`;
       modal.classList.add("open");
-      showToast("Appointment booked successfully! ✦", "success");
+      showToast("Booking request sent! We'll confirm via WhatsApp ✦", "success");
+
     } catch (err) {
       console.error(err);
-      showToast("Booking failed. Please try again.", "error");
+      showToast("Submission failed. Please try again.", "error");
     } finally {
       btn.disabled = false;
-      btn.innerHTML = "<span>Confirm Appointment</span>";
+      btn.innerHTML = "<span>Send Booking Request</span>";
     }
   });
 
   modalClose.addEventListener("click", () => modal.classList.remove("open"));
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("open")) modal.classList.remove("open"); });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.classList.contains("open")) modal.classList.remove("open");
+  });
 }
 
 // ===== TESTIMONIALS =====
 function renderTestimonials() {
   const slider = document.getElementById("testiSlider");
   const dots   = document.getElementById("testiDots");
+  if (!slider || !dots || TESTIMONIALS.length === 0) return;
+
+  if (testiIndex >= TESTIMONIALS.length) testiIndex = 0;
 
   slider.innerHTML = TESTIMONIALS.map((t) => `
     <div class="testi-card" role="listitem" aria-label="Testimonial from ${t.name}">
-      <div class="testi-stars" aria-label="${t.stars} out of 5 stars">${"★".repeat(t.stars)}</div>
+      <div class="testi-stars" aria-label="${t.stars} out of 5 stars">${"★".repeat(t.stars || 5)}</div>
       <p class="testi-text">"${t.text}"</p>
       <div class="testi-author">
         <div class="testi-avatar" aria-hidden="true">${t.name[0]}</div>
         <div>
           <p class="testi-name">${t.name}</p>
-          <p class="testi-location">${t.location}</p>
+          <p class="testi-location">${t.location || ""}</p>
         </div>
       </div>
     </div>
@@ -613,6 +679,7 @@ function startTestiAutoplay() {
   clearInterval(testiAutoplay);
   testiAutoplay = setInterval(nextTesti, 4500);
   const sliderEl = document.getElementById("testiSlider");
+  if (!sliderEl) return;
   if (testiMouseEnterHandler) {
     sliderEl.removeEventListener("mouseenter", testiMouseEnterHandler);
     sliderEl.removeEventListener("mouseleave", testiMouseLeaveHandler);
@@ -697,10 +764,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   initLoader();
   initNavbar();
   initReveal();
-  renderServices();
   initCart();
   initBooking();
-  renderTestimonials();
   renderGallery();
   initContact();
   initSearch();
@@ -709,16 +774,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   initResizeHandler();
   initSidebar();
 
-  // Products logic:
-  // Firebase configured → ONLY Firebase (demo products NEVER show, even if collection is empty)
-  // Firebase NOT configured → demo products as placeholder
   if (firebaseReady) {
-    loadProductsFromFirebase(); // listener handles all rendering internally
+    loadServicesFromFirebase();
+    loadTestimonialsFromFirebase();
+    loadProductsFromFirebase();
   } else {
+    SERVICES = FALLBACK_SERVICES;
+    TESTIMONIALS = FALLBACK_TESTIMONIALS;
     PRODUCTS = DEMO_PRODUCTS;
+    renderServices();
+    renderTestimonials();
     renderFilters();
     renderSidebarProducts();
     renderFeaturedProducts();
     renderProducts();
+    populateBookingServiceOptions();
   }
 });
