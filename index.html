@@ -2,12 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="description" content="LA'KENZY Skincare & Aesthetic Spa — Premium skincare, advanced aesthetics, and luxury spa treatments in Lagos, Nigeria."/>
   <title>LA'KENZY Skincare &amp; Aesthetic Spa</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <!-- Font Awesome for service & gallery icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -27,18 +29,27 @@
     </div>
   </div>
 
-  
-
-  <!-- FIX: Mobile nav overlay added — was missing, taps fell through the nav to content behind -->
+  <!-- Mobile nav overlay -->
   <div class="nav-overlay" id="navOverlay" aria-hidden="true"></div>
+
+  <!-- ===== SIDEBAR — All Products ===== -->
+  <div class="sidebar-overlay" id="sidebarOverlay" aria-hidden="true"></div>
+  <aside class="product-sidebar" id="productSidebar" role="dialog" aria-label="All products" aria-modal="true">
+    <div class="sidebar-header">
+      <h3><i class="fas fa-store"></i> All Products</h3>
+      <button class="sidebar-close" id="sidebarClose" aria-label="Close sidebar">✕</button>
+    </div>
+    <div class="sidebar-products-list" id="sidebarProductsList"></div>
+    <div class="sidebar-footer">
+      <a href="#marketplace" class="btn-gold sidebar-view-all" id="sidebarViewAll">View Full Marketplace</a>
+    </div>
+  </aside>
 
   <!-- ===== NAVBAR ===== -->
   <nav id="navbar" role="navigation" aria-label="Main navigation">
     <div class="nav-container">
       <a href="#home" class="nav-logo" aria-label="LA'KENZY Home">
-        <div class="logo-circle" aria-hidden="true">
-          <span>LK</span>
-        </div>
+        <div class="logo-circle" aria-hidden="true"><span>LK</span></div>
         <div class="logo-text">
           <span class="logo-name">LA'KENZY</span>
           <span class="logo-tagline">Skincare &amp; Aesthetic Spa</span>
@@ -54,6 +65,10 @@
         <li><a href="#contact">Contact</a></li>
         <li><a href="#booking" class="nav-cta">Book Appointment</a></li>
       </ul>
+      <!-- Sidebar toggle button -->
+      <button class="sidebar-open-btn" id="sidebarOpen" aria-label="Browse all products" title="All Products">
+        <i class="fas fa-store"></i>
+      </button>
       <button class="cart-btn" id="cartToggle" aria-label="Open cart" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
         <span class="cart-count" id="cartCount" aria-live="polite">0</span>
@@ -106,9 +121,7 @@
         <div class="stat"><span class="stat-num">5★</span><span class="stat-label">Rated Spa</span></div>
       </div>
     </div>
-    <div class="scroll-indicator" aria-hidden="true">
-      <div class="scroll-dot"></div>
-    </div>
+    <div class="scroll-indicator" aria-hidden="true"><div class="scroll-dot"></div></div>
   </section>
 
   <!-- ===== ABOUT ===== -->
@@ -156,6 +169,23 @@
     </div>
   </section>
 
+  <!-- ===== FEATURED PRODUCTS (Home — top 4) ===== -->
+  <section id="featured-products" class="featured-products section-pad">
+    <div class="container">
+      <div class="section-header reveal">
+        <p class="section-eyebrow">Top Picks</p>
+        <h2 class="section-title">Featured <em>Products</em></h2>
+        <p class="section-desc">Our best-selling skincare products, loved by clients across Lagos.</p>
+      </div>
+      <div class="featured-products-grid products-grid" id="featuredProductsGrid"></div>
+      <div class="featured-cta reveal">
+        <a href="#marketplace" class="btn-outline">
+          <i class="fas fa-store"></i>&nbsp; View All Products
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== MARKETPLACE ===== -->
   <section id="marketplace" class="marketplace section-pad">
     <div class="container">
@@ -167,7 +197,6 @@
       <div class="market-controls reveal">
         <div class="market-search">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <!-- FIX: added id and aria-label for accessibility -->
           <input type="search" id="productSearch" placeholder="Search products..." aria-label="Search products"/>
         </div>
         <div class="market-filters" id="marketFilters" role="group" aria-label="Filter by category"></div>
@@ -307,14 +336,14 @@
         <div class="contact-info reveal">
           <div class="contact-card glass-card">
             <div class="contact-item">
-              <div class="contact-icon" aria-hidden="true">📍</div>
+              <div class="contact-icon" aria-hidden="true"><i class="fas fa-location-dot"></i></div>
               <div>
                 <strong>Location</strong>
                 <p>Omu-Arogun Bus-Stop, Lagos</p>
               </div>
             </div>
             <div class="contact-item">
-              <div class="contact-icon" aria-hidden="true">📞</div>
+              <div class="contact-icon" aria-hidden="true"><i class="fas fa-phone"></i></div>
               <div>
                 <strong>Phone</strong>
                 <p><a href="tel:+2348039239749">08039239749</a></p>
@@ -322,14 +351,14 @@
               </div>
             </div>
             <div class="contact-item">
-              <div class="contact-icon" aria-hidden="true">🌐</div>
+              <div class="contact-icon" aria-hidden="true"><i class="fas fa-globe"></i></div>
               <div>
                 <strong>Website</strong>
                 <p><a href="https://www.lakenzyorganics.com.ng" target="_blank" rel="noopener noreferrer">lakenzyorganics.com.ng</a></p>
               </div>
             </div>
             <div class="contact-item">
-              <div class="contact-icon" aria-hidden="true">📸</div>
+              <div class="contact-icon" aria-hidden="true"><i class="fab fa-instagram"></i></div>
               <div>
                 <strong>Instagram</strong>
                 <p><a href="https://instagram.com/lakenzyorganics" target="_blank" rel="noopener noreferrer">@lakenzyorganics</a></p>
@@ -341,12 +370,11 @@
             </div>
           </div>
           <div class="map-placeholder">
-            <span>📍 Omu-Arogun Bus-Stop, Lagos</span>
+            <i class="fas fa-location-dot"></i> <span>Omu-Arogun Bus-Stop, Lagos</span>
             <small>Google Maps Integration Ready</small>
           </div>
         </div>
         <div class="contact-form reveal">
-          <!-- FIX: form element wraps the glass-card so the submit works correctly -->
           <form id="contactForm" class="glass-card" novalidate>
             <div class="form-group">
               <label for="cName">Your Name</label>
