@@ -222,27 +222,19 @@ window.scrollToBooking = function(service) {
 
 // ===== FIREBASE PRODUCTS LOADER =====
 async function loadProductsFromFirebase() {
-  if (!db) return false;
+  if (!db) return;
   try {
-    const snap = await getDocs(collection(db, "products"));
-    if (snap.empty) return false; // no products in Firebase yet
-    PRODUCTS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    firebaseProductsLoaded = true;
-
-    // Subscribe to real-time updates
+    // Real-time listener — handles initial load + future changes instantly
     onSnapshot(collection(db, "products"), (snapshot) => {
       PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       const searchVal = document.getElementById("productSearch")?.value || "";
       renderFilters();
-      renderProducts(searchVal);
-      renderFeaturedProducts();
       renderSidebarProducts();
+      renderFeaturedProducts();
+      renderProducts(searchVal);
     });
-
-    return true;
   } catch (e) {
     console.warn("Could not load products from Firebase:", e);
-    return false;
   }
 }
 
@@ -309,14 +301,21 @@ function renderProducts(queryStr = "") {
   initReveal();
 }
 
-// ===== FEATURED PRODUCTS (Home — top 4 only) =====
+// ===== FEATURED PRODUCTS (Home — top 4 only, hidden when no products) =====
 function renderFeaturedProducts() {
   const grid = document.getElementById("featuredProductsGrid");
+  const section = document.getElementById("featured-products");
   if (!grid) return;
+
+  if (PRODUCTS.length === 0) {
+    if (section) section.style.display = "none"; // hide entire section — no demo bleed
+    return;
+  }
+  if (section) section.style.display = ""; // show once products exist
 
   const featured = PRODUCTS.slice(0, 4);
   if (featured.length === 0) {
-    grid.innerHTML = `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem 0">Products loading…</p>`;
+    grid.innerHTML = "";
     return;
   }
 
@@ -710,14 +709,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   initResizeHandler();
   initSidebar();
 
-  // Load products: try Firebase first, fall back to demo only if Firebase has no products
-  const fromFirebase = await loadProductsFromFirebase();
-  if (!fromFirebase) {
+  // Products logic:
+  // Firebase configured → ONLY Firebase (demo products NEVER show, even if collection is empty)
+  // Firebase NOT configured → demo products as placeholder
+  if (firebaseReady) {
+    loadProductsFromFirebase(); // listener handles all rendering internally
+  } else {
     PRODUCTS = DEMO_PRODUCTS;
+    renderFilters();
+    renderSidebarProducts();
+    renderFeaturedProducts();
+    renderProducts();
   }
-
-  renderFilters();
-  renderProducts();
-  renderFeaturedProducts();
-  renderSidebarProducts();
 });
