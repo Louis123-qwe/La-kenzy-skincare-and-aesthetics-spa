@@ -1,11 +1,11 @@
 /* =============================================
    LA'KENZY SKINCARE & AESTHETIC SPA
-   app.js — Modular Vanilla JavaScript (Audited & Fixed)
+   app.js — Updated: Firebase-first products, FA icons, featured products, sidebar marketplace
    ============================================= */
 
 // ===== FIREBASE CONFIG =====
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp }
+import { getFirestore, collection, addDoc, query, where, getDocs, onSnapshot, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -18,73 +18,73 @@ const firebaseConfig = {
 };
 
 let db;
+let firebaseReady = false;
 try {
   const app = initializeApp(firebaseConfig);
   db = getFirestore(app);
+  firebaseReady = true;
 } catch (e) {
-  console.warn("Firebase not configured yet. Appointments will use demo mode.");
+  console.warn("Firebase not configured yet. Running in demo mode.");
 }
 
-// ===== DATA =====
+// ===== SERVICES DATA (no emojis — use Font Awesome icon classes) =====
 const SERVICES = [
-  { name: "Skin Analysis", icon: "🔬", desc: "Advanced skin assessment using professional diagnostic tools to identify your unique skin type and concerns.", price: "₦5,000" },
-  { name: "Skin Treatment", icon: "✨", desc: "Targeted treatment protocols customised to address hyperpigmentation, acne, and uneven texture.", price: "₦15,000" },
-  { name: "Full Body Massage", icon: "💆‍♀️", desc: "Deeply relaxing full-body massage using premium aromatherapy oils for total mind-body renewal.", price: "₦20,000" },
-  { name: "Facials", icon: "🌸", desc: "Luxurious facial treatments tailored for deep cleansing, hydration, and natural radiance.", price: "₦12,000" },
-  { name: "Chemical Peels", icon: "🧪", desc: "Professional-grade peels that resurface skin, reduce dark spots, and reveal a brighter complexion.", price: "₦18,000" },
-  { name: "Mesotherapy", icon: "💉", desc: "Micro-injections of vitamins and nutrients directly into the skin for intense rejuvenation.", price: "₦25,000" },
-  { name: "Teeth Whitening", icon: "🦷", desc: "Advanced LED whitening treatment for a dazzling, confident smile in just one session.", price: "₦15,000" },
-  { name: "Pedicure & Manicure", icon: "💅", desc: "Premium nail care ritual with exfoliation, cuticle treatment, and long-lasting polish.", price: "₦8,000" },
-  { name: "Waxing", icon: "🪷", desc: "Gentle, long-lasting hair removal using premium warm wax for silky smooth skin.", price: "₦5,000" },
-  { name: "Lash Extension", icon: "👁️", desc: "Individually applied premium silk lashes for dramatic, fluttery eyes that last weeks.", price: "₦20,000" },
-  { name: "Microblading", icon: "🎨", desc: "Semi-permanent brow technique that creates natural, hair-like strokes for perfectly shaped brows.", price: "₦35,000" },
-  { name: "Stretch Mark Treatment", icon: "🌟", desc: "Advanced combination therapy to visibly reduce the appearance of stretch marks and scars.", price: "₦22,000" },
+  { name: "Skin Analysis",        icon: "fas fa-microscope",        desc: "Advanced skin assessment using professional diagnostic tools to identify your unique skin type and concerns.", price: "₦5,000" },
+  { name: "Skin Treatment",       icon: "fas fa-spa",               desc: "Targeted treatment protocols customised to address hyperpigmentation, acne, and uneven texture.", price: "₦15,000" },
+  { name: "Full Body Massage",    icon: "fas fa-hand-holding-heart", desc: "Deeply relaxing full-body massage using premium aromatherapy oils for total mind-body renewal.", price: "₦20,000" },
+  { name: "Facials",              icon: "fas fa-face-smile-beam",   desc: "Luxurious facial treatments tailored for deep cleansing, hydration, and natural radiance.", price: "₦12,000" },
+  { name: "Chemical Peels",       icon: "fas fa-flask",             desc: "Professional-grade peels that resurface skin, reduce dark spots, and reveal a brighter complexion.", price: "₦18,000" },
+  { name: "Mesotherapy",          icon: "fas fa-syringe",           desc: "Micro-injections of vitamins and nutrients directly into the skin for intense rejuvenation.", price: "₦25,000" },
+  { name: "Teeth Whitening",      icon: "fas fa-teeth-open",        desc: "Advanced LED whitening treatment for a dazzling, confident smile in just one session.", price: "₦15,000" },
+  { name: "Pedicure & Manicure",  icon: "fas fa-hand-sparkles",     desc: "Premium nail care ritual with exfoliation, cuticle treatment, and long-lasting polish.", price: "₦8,000" },
+  { name: "Waxing",               icon: "fas fa-leaf",              desc: "Gentle, long-lasting hair removal using premium warm wax for silky smooth skin.", price: "₦5,000" },
+  { name: "Lash Extension",       icon: "fas fa-eye",               desc: "Individually applied premium silk lashes for dramatic, fluttery eyes that last weeks.", price: "₦20,000" },
+  { name: "Microblading",         icon: "fas fa-paint-brush",       desc: "Semi-permanent brow technique that creates natural, hair-like strokes for perfectly shaped brows.", price: "₦35,000" },
+  { name: "Stretch Mark Treatment", icon: "fas fa-star-of-life",    desc: "Advanced combination therapy to visibly reduce the appearance of stretch marks and scars.", price: "₦22,000" },
 ];
 
-const PRODUCTS = [
-  { id: "p1", name: "Glow Serum 30ml", category: "Serums", price: 12500, emoji: "✨", desc: "Vitamin C brightening serum" },
-  { id: "p2", name: "Deep Hydration Cream", category: "Moisturisers", price: 9500, emoji: "💧", desc: "24hr moisture barrier cream" },
-  { id: "p3", name: "Exfoliating Toner", category: "Toners", price: 7500, emoji: "🌿", desc: "AHA/BHA gentle exfoliant" },
-  { id: "p4", name: "SPF50 Sunscreen", category: "SPF", price: 8500, emoji: "☀️", desc: "Broad spectrum protection" },
-  { id: "p5", name: "Cleansing Oil", category: "Cleansers", price: 6500, emoji: "🫧", desc: "Gentle makeup dissolving oil" },
-  { id: "p6", name: "Retinol Night Cream", category: "Moisturisers", price: 14500, emoji: "🌙", desc: "Anti-ageing overnight repair" },
-  { id: "p7", name: "Kojic Acid Soap", category: "Cleansers", price: 3500, emoji: "🧼", desc: "Brightening complexion bar" },
-  { id: "p8", name: "Hyaluronic Essence", category: "Serums", price: 11000, emoji: "💎", desc: "Plumping hydration booster" },
+// ===== DEMO PRODUCTS — only shown when Firebase has NO products collection =====
+const DEMO_PRODUCTS = [
+  { id: "p1", name: "Glow Serum 30ml",      category: "Serums",       price: 12500, icon: "fas fa-star", desc: "Vitamin C brightening serum" },
+  { id: "p2", name: "Deep Hydration Cream", category: "Moisturisers", price: 9500,  icon: "fas fa-droplet", desc: "24hr moisture barrier cream" },
+  { id: "p3", name: "Exfoliating Toner",    category: "Toners",       price: 7500,  icon: "fas fa-leaf", desc: "AHA/BHA gentle exfoliant" },
+  { id: "p4", name: "SPF50 Sunscreen",      category: "SPF",          price: 8500,  icon: "fas fa-sun", desc: "Broad spectrum protection" },
+  { id: "p5", name: "Cleansing Oil",        category: "Cleansers",    price: 6500,  icon: "fas fa-soap", desc: "Gentle makeup dissolving oil" },
+  { id: "p6", name: "Retinol Night Cream",  category: "Moisturisers", price: 14500, icon: "fas fa-moon", desc: "Anti-ageing overnight repair" },
+  { id: "p7", name: "Kojic Acid Soap",      category: "Cleansers",    price: 3500,  icon: "fas fa-bars-staggered", desc: "Brightening complexion bar" },
+  { id: "p8", name: "Hyaluronic Essence",   category: "Serums",       price: 11000, icon: "fas fa-gem", desc: "Plumping hydration booster" },
 ];
 
 const TESTIMONIALS = [
-  { name: "Adaeze Okonkwo", location: "Victoria Island, Lagos", stars: 5, text: "LA'KENZY completely transformed my skin. After years of struggling with hyperpigmentation, my skin has never looked more even and glowing. The team is incredibly professional and caring." },
-  { name: "Fatima Abdullahi", location: "Abuja", stars: 5, text: "I drove all the way from Abuja and it was absolutely worth it. The mesotherapy session was painless and I noticed a visible difference within a week. My friends keep asking what I'm doing!" },
-  { name: "Chidinma Eze", location: "Lekki, Lagos", stars: 5, text: "The facials here are absolutely divine. You can tell they use premium products and the estheticians truly understand melanin skin. My go-to spa in Lagos." },
-  { name: "Blessing Nwosu", location: "Port Harcourt", stars: 5, text: "Had my microblading done here and I get compliments every single day. So natural looking! The attention to detail is unmatched. I won't go anywhere else." },
-  { name: "Kemi Olatunji", location: "Surulere, Lagos", stars: 5, text: "The teeth whitening results were instant and stunning. The environment is so luxurious and clean. Booking is so easy and the team always follows up. 10/10 experience!" },
+  { name: "Adaeze Okonkwo",  location: "Victoria Island, Lagos", stars: 5, text: "LA'KENZY completely transformed my skin. After years of struggling with hyperpigmentation, my skin has never looked more even and glowing. The team is incredibly professional and caring." },
+  { name: "Fatima Abdullahi",location: "Abuja",                  stars: 5, text: "I drove all the way from Abuja and it was absolutely worth it. The mesotherapy session was painless and I noticed a visible difference within a week. My friends keep asking what I'm doing!" },
+  { name: "Chidinma Eze",    location: "Lekki, Lagos",           stars: 5, text: "The facials here are absolutely divine. You can tell they use premium products and the estheticians truly understand melanin skin. My go-to spa in Lagos." },
+  { name: "Blessing Nwosu",  location: "Port Harcourt",          stars: 5, text: "Had my microblading done here and I get compliments every single day. So natural looking! The attention to detail is unmatched. I won't go anywhere else." },
+  { name: "Kemi Olatunji",   location: "Surulere, Lagos",        stars: 5, text: "The teeth whitening results were instant and stunning. The environment is so luxurious and clean. Booking is so easy and the team always follows up. 10/10 experience!" },
 ];
 
 const GALLERY_ITEMS = [
-  { label: "Before & After", tag: "Skin Treatment", tall: true, emoji: "✨" },
-  { label: "Facial Treatment", tag: "Facials", emoji: "🌸" },
-  { label: "Lash Extensions", tag: "Lash Extensions", emoji: "👁️" },
-  { label: "Body Massage", tag: "Wellness", wide: true, emoji: "💆‍♀️" },
-  { label: "Chemical Peel", tag: "Peels", emoji: "🧪" },
-  { label: "Teeth Whitening", tag: "Dental", emoji: "🦷" },
-  { label: "Brow Microblading", tag: "Microblading", tall: true, emoji: "🎨" },
-  { label: "Manicure & Pedi", tag: "Nails", emoji: "💅" },
+  { label: "Before & After",    tag: "Skin Treatment",  tall: true,  icon: "fas fa-wand-magic-sparkles" },
+  { label: "Facial Treatment",  tag: "Facials",                      icon: "fas fa-spa" },
+  { label: "Lash Extensions",   tag: "Lash Extensions",              icon: "fas fa-eye" },
+  { label: "Body Massage",      tag: "Wellness",        wide: true,  icon: "fas fa-hand-holding-heart" },
+  { label: "Chemical Peel",     tag: "Peels",                        icon: "fas fa-flask" },
+  { label: "Teeth Whitening",   tag: "Dental",                       icon: "fas fa-teeth-open" },
+  { label: "Brow Microblading", tag: "Microblading",   tall: true,  icon: "fas fa-paint-brush" },
+  { label: "Manicure & Pedi",   tag: "Nails",                        icon: "fas fa-hand-sparkles" },
 ];
+
+// ===== LIVE PRODUCTS STATE =====
+let PRODUCTS = []; // populated from Firebase or demo fallback
+let firebaseProductsLoaded = false;
 
 // ===== CART STATE =====
 let cart = [];
-try {
-  // FIX: wrap localStorage access in try/catch for private browsing mode
-  cart = JSON.parse(localStorage.getItem("lk_cart") || "[]");
-} catch (e) {
-  cart = [];
-}
+try { cart = JSON.parse(localStorage.getItem("lk_cart") || "[]"); } catch (e) { cart = []; }
 
 let activeFilter = "All";
 let testiIndex = 0;
 let testiAutoplay;
-
-// FIX: store named handler refs so we can removeEventListener cleanly
 let testiMouseEnterHandler = null;
 let testiMouseLeaveHandler = null;
 
@@ -97,23 +97,16 @@ function showToast(msg, type = "success") {
   t._timer = setTimeout(() => { t.className = "toast"; }, 3200);
 }
 
-function formatPrice(n) {
-  return "₦" + n.toLocaleString("en-NG");
-}
+function formatPrice(n) { return "₦" + n.toLocaleString("en-NG"); }
 
 function generateRef() {
   return "LK" + Date.now().toString(36).toUpperCase().slice(-6) + Math.random().toString(36).slice(2, 5).toUpperCase();
 }
 
 function saveCart() {
-  try {
-    localStorage.setItem("lk_cart", JSON.stringify(cart));
-  } catch (e) {
-    // private browsing — no-op
-  }
+  try { localStorage.setItem("lk_cart", JSON.stringify(cart)); } catch (e) {}
   const count = cart.reduce((s, i) => s + i.qty, 0);
   document.getElementById("cartCount").textContent = count;
-  // FIX: update aria-label on cart button to reflect count
   const btn = document.getElementById("cartToggle");
   if (btn) btn.setAttribute("aria-label", count > 0 ? `Open cart (${count} items)` : "Open cart");
 }
@@ -122,14 +115,11 @@ function saveCart() {
 function initLoader() {
   const loader = document.getElementById("loader");
   const hide = () => loader.classList.add("hidden");
-  // FIX: use both load event and a hard fallback — previous version could fire twice
-  // causing flicker if load event was already fired before script ran
   if (document.readyState === "complete") {
     setTimeout(hide, 2200);
   } else {
     window.addEventListener("load", () => setTimeout(hide, 2200), { once: true });
   }
-  // Hard fallback
   setTimeout(hide, 4000);
 }
 
@@ -159,33 +149,18 @@ function initNavbar() {
     navOverlay.classList.remove("open");
     document.body.style.overflow = "";
     hamburger.setAttribute("aria-expanded", "false");
-    // FIX: delay display:none until transition ends
     setTimeout(() => { navOverlay.style.display = ""; }, 400);
   }
 
   hamburger.addEventListener("click", () => {
-    if (hamburger.classList.contains("open")) {
-      closeMobileNav();
-    } else {
-      openMobileNav();
-    }
+    if (hamburger.classList.contains("open")) { closeMobileNav(); } else { openMobileNav(); }
   });
-
-  navLinks.querySelectorAll("a").forEach(a => {
-    a.addEventListener("click", () => closeMobileNav());
-  });
-
-  // FIX: clicking the overlay closes the nav (was completely missing before)
+  navLinks.querySelectorAll("a").forEach(a => a.addEventListener("click", () => closeMobileNav()));
   navOverlay.addEventListener("click", closeMobileNav);
-
-  // FIX: Escape key closes mobile nav
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && navLinks.classList.contains("open")) {
-      closeMobileNav();
-    }
+    if (e.key === "Escape" && navLinks.classList.contains("open")) closeMobileNav();
   });
 
-  // Active link on scroll
   const sections = document.querySelectorAll("section[id]");
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -193,10 +168,7 @@ function initNavbar() {
         navLinks.querySelectorAll("a").forEach(a => {
           const isActive = a.getAttribute("href") === `#${entry.target.id}`;
           a.classList.toggle("active", isActive);
-          // FIX: also remove active from nav-cta when other sections are active
-          if (isActive && a.classList.contains("nav-cta")) {
-            a.classList.remove("active");
-          }
+          if (isActive && a.classList.contains("nav-cta")) a.classList.remove("active");
         });
       }
     });
@@ -224,7 +196,7 @@ function renderServices() {
   grid.innerHTML = SERVICES.map((s, i) => `
     <article class="service-card reveal" style="transition-delay:${i * 40}ms">
       <div class="service-img" aria-hidden="true">
-        <span>${s.icon}</span>
+        <i class="${s.icon}"></i>
       </div>
       <div class="service-body">
         <h3 class="service-name">${s.name}</h3>
@@ -242,17 +214,51 @@ function renderServices() {
 window.scrollToBooking = function(service) {
   const sel = document.getElementById("bService");
   if (sel) {
-    // FIX: match by option VALUE not text content — options now have explicit values
     const opt = [...sel.options].find(o => o.value === service);
     if (opt) sel.value = service;
   }
   document.getElementById("booking").scrollIntoView({ behavior: "smooth" });
 };
 
-// ===== MARKETPLACE =====
+// ===== FIREBASE PRODUCTS LOADER =====
+async function loadProductsFromFirebase() {
+  if (!db) return false;
+  try {
+    const snap = await getDocs(collection(db, "products"));
+    if (snap.empty) return false; // no products in Firebase yet
+    PRODUCTS = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    firebaseProductsLoaded = true;
+
+    // Subscribe to real-time updates
+    onSnapshot(collection(db, "products"), (snapshot) => {
+      PRODUCTS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const searchVal = document.getElementById("productSearch")?.value || "";
+      renderFilters();
+      renderProducts(searchVal);
+      renderFeaturedProducts();
+      renderSidebarProducts();
+    });
+
+    return true;
+  } catch (e) {
+    console.warn("Could not load products from Firebase:", e);
+    return false;
+  }
+}
+
+// ===== PRODUCT ICON HELPER =====
+function getProductIcon(product) {
+  // Firebase products may have an `icon` field (FA class) or `image` (URL)
+  if (product.image) return `<img src="${product.image}" alt="${product.name}" loading="lazy" />`;
+  const iconClass = product.icon || "fas fa-bottle-droplet";
+  return `<i class="${iconClass}"></i>`;
+}
+
+// ===== MARKETPLACE FILTERS & PRODUCTS =====
 function renderFilters() {
-  const cats = ["All", ...new Set(PRODUCTS.map(p => p.category))];
+  const cats = ["All", ...new Set(PRODUCTS.map(p => p.category).filter(Boolean))];
   const wrap = document.getElementById("marketFilters");
+  if (!wrap) return;
   wrap.innerHTML = cats.map(c => `
     <button class="filter-btn ${c === activeFilter ? "active" : ""}" data-cat="${c}" aria-pressed="${c === activeFilter}">${c}</button>
   `).join("");
@@ -260,17 +266,19 @@ function renderFilters() {
     btn.addEventListener("click", () => {
       activeFilter = btn.dataset.cat;
       renderFilters();
-      renderProducts(document.getElementById("productSearch").value);
+      renderProducts(document.getElementById("productSearch")?.value || "");
     });
   });
 }
 
 function renderProducts(queryStr = "") {
   const grid = document.getElementById("productsGrid");
+  if (!grid) return;
+
   const filtered = PRODUCTS.filter(p => {
     const matchCat = activeFilter === "All" || p.category === activeFilter;
-    const matchQ = p.name.toLowerCase().includes(queryStr.toLowerCase()) ||
-                   p.category.toLowerCase().includes(queryStr.toLowerCase());
+    const matchQ = (p.name || "").toLowerCase().includes(queryStr.toLowerCase()) ||
+                   (p.category || "").toLowerCase().includes(queryStr.toLowerCase());
     return matchCat && matchQ;
   });
 
@@ -281,10 +289,11 @@ function renderProducts(queryStr = "") {
 
   grid.innerHTML = filtered.map(p => `
     <article class="product-card reveal">
-      <div class="product-img" aria-hidden="true"><span>${p.emoji}</span></div>
+      <div class="product-img" aria-hidden="true">${getProductIcon(p)}</div>
       <div class="product-body">
-        <p class="product-category">${p.category}</p>
+        <p class="product-category">${p.category || ""}</p>
         <h4 class="product-name">${p.name}</h4>
+        <p class="product-desc">${p.desc || p.description || ""}</p>
         <p class="product-price">${formatPrice(p.price)}</p>
         <div class="product-controls">
           <div class="qty-selector" role="group" aria-label="Quantity for ${p.name}">
@@ -300,8 +309,66 @@ function renderProducts(queryStr = "") {
   initReveal();
 }
 
-window.changeQty = function(id, delta) {
-  const el = document.getElementById(`qty-${id}`);
+// ===== FEATURED PRODUCTS (Home — top 4 only) =====
+function renderFeaturedProducts() {
+  const grid = document.getElementById("featuredProductsGrid");
+  if (!grid) return;
+
+  const featured = PRODUCTS.slice(0, 4);
+  if (featured.length === 0) {
+    grid.innerHTML = `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem 0">Products loading…</p>`;
+    return;
+  }
+
+  grid.innerHTML = featured.map(p => `
+    <article class="product-card reveal">
+      <div class="product-img" aria-hidden="true">${getProductIcon(p)}</div>
+      <div class="product-body">
+        <p class="product-category">${p.category || ""}</p>
+        <h4 class="product-name">${p.name}</h4>
+        <p class="product-desc">${p.desc || p.description || ""}</p>
+        <p class="product-price">${formatPrice(p.price)}</p>
+        <div class="product-controls">
+          <div class="qty-selector" role="group" aria-label="Quantity for ${p.name}">
+            <button onclick="changeQty('${p.id}', -1)" aria-label="Decrease quantity">−</button>
+            <span id="qty-feat-${p.id}" aria-live="polite">1</span>
+            <button onclick="changeQty('${p.id}', 1, true)" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="add-cart-btn" onclick="addToCartFeat('${p.id}')">Add to Cart</button>
+        </div>
+      </div>
+    </article>
+  `).join("");
+  initReveal();
+}
+
+// ===== SIDEBAR PRODUCTS =====
+function renderSidebarProducts() {
+  const list = document.getElementById("sidebarProductsList");
+  if (!list) return;
+
+  if (PRODUCTS.length === 0) {
+    list.innerHTML = `<p class="sidebar-empty">No products yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = PRODUCTS.map(p => `
+    <div class="sidebar-product-item">
+      <div class="sidebar-product-icon">${getProductIcon(p)}</div>
+      <div class="sidebar-product-info">
+        <span class="sidebar-product-name">${p.name}</span>
+        <span class="sidebar-product-price">${formatPrice(p.price)}</span>
+      </div>
+      <button class="sidebar-add-btn" onclick="addToCartById('${p.id}')" aria-label="Add ${p.name} to cart">
+        <i class="fas fa-plus"></i>
+      </button>
+    </div>
+  `).join("");
+}
+
+window.changeQty = function(id, delta, isFeat = false) {
+  const elId = isFeat ? `qty-feat-${id}` : `qty-${id}`;
+  const el = document.getElementById(elId);
   if (!el) return;
   let val = parseInt(el.textContent) + delta;
   if (val < 1) val = 1;
@@ -313,15 +380,29 @@ window.addToCart = function(id) {
   if (!product) return;
   const qtyEl = document.getElementById(`qty-${id}`);
   const qty = qtyEl ? parseInt(qtyEl.textContent) : 1;
-
   const existing = cart.find(c => c.id === id);
-  if (existing) {
-    existing.qty += qty;
-  } else {
-    cart.push({ ...product, qty });
-  }
-  saveCart();
-  renderCart();
+  if (existing) { existing.qty += qty; } else { cart.push({ ...product, qty }); }
+  saveCart(); renderCart();
+  showToast(`${product.name} added to cart ✦`, "success");
+};
+
+window.addToCartFeat = function(id) {
+  const product = PRODUCTS.find(p => p.id === id);
+  if (!product) return;
+  const qtyEl = document.getElementById(`qty-feat-${id}`);
+  const qty = qtyEl ? parseInt(qtyEl.textContent) : 1;
+  const existing = cart.find(c => c.id === id);
+  if (existing) { existing.qty += qty; } else { cart.push({ ...product, qty }); }
+  saveCart(); renderCart();
+  showToast(`${product.name} added to cart ✦`, "success");
+};
+
+window.addToCartById = function(id) {
+  const product = PRODUCTS.find(p => p.id === id);
+  if (!product) return;
+  const existing = cart.find(c => c.id === id);
+  if (existing) { existing.qty += 1; } else { cart.push({ ...product, qty: 1 }); }
+  saveCart(); renderCart();
   showToast(`${product.name} added to cart ✦`, "success");
 };
 
@@ -338,7 +419,7 @@ function renderCart() {
 
   items.innerHTML = cart.map(item => `
     <div class="cart-item">
-      <div class="cart-item-img" aria-hidden="true"><span style="font-size:1.6rem">${item.emoji}</span></div>
+      <div class="cart-item-img" aria-hidden="true">${getProductIcon(item)}</div>
       <div>
         <p class="cart-item-name">${item.name}</p>
         <p class="cart-item-price">${formatPrice(item.price)}</p>
@@ -361,44 +442,28 @@ window.updateCartQty = function(id, delta) {
   if (!item) return;
   item.qty += delta;
   if (item.qty <= 0) { removeFromCart(id); return; }
-  saveCart();
-  renderCart();
+  saveCart(); renderCart();
 };
 
 window.removeFromCart = function(id) {
   cart = cart.filter(c => c.id !== id);
-  saveCart();
-  renderCart();
+  saveCart(); renderCart();
 };
 
 function initCart() {
   const toggle = document.getElementById("cartToggle");
-  const close = document.getElementById("cartClose");
-  const overlay = document.getElementById("cartOverlay");
-  const panel = document.getElementById("cartPanel");
-  const checkout = document.getElementById("cartCheckout");
+  const close  = document.getElementById("cartClose");
+  const overlay= document.getElementById("cartOverlay");
+  const panel  = document.getElementById("cartPanel");
+  const checkout=document.getElementById("cartCheckout");
 
-  const openCart = () => {
-    panel.classList.add("open");
-    overlay.classList.add("open");
-    document.body.style.overflow = "hidden";
-    toggle.setAttribute("aria-expanded", "true");
-  };
-  const closeCart = () => {
-    panel.classList.remove("open");
-    overlay.classList.remove("open");
-    document.body.style.overflow = "";
-    toggle.setAttribute("aria-expanded", "false");
-  };
+  const openCart  = () => { panel.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; toggle.setAttribute("aria-expanded", "true"); };
+  const closeCart = () => { panel.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; toggle.setAttribute("aria-expanded", "false"); };
 
   toggle.addEventListener("click", openCart);
   close.addEventListener("click", closeCart);
   overlay.addEventListener("click", closeCart);
-
-  // FIX: Escape closes cart
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && panel.classList.contains("open")) closeCart();
-  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("open")) closeCart(); });
 
   checkout.addEventListener("click", () => {
     if (cart.length === 0) { showToast("Your cart is empty", "error"); return; }
@@ -408,8 +473,25 @@ function initCart() {
     window.open(`https://wa.me/2348039239749?text=${msg}`, "_blank", "noopener,noreferrer");
   });
 
-  saveCart();
-  renderCart();
+  saveCart(); renderCart();
+}
+
+// ===== SIDEBAR TOGGLE =====
+function initSidebar() {
+  const sidebar    = document.getElementById("productSidebar");
+  const openBtn    = document.getElementById("sidebarOpen");
+  const closeBtn   = document.getElementById("sidebarClose");
+  const overlay    = document.getElementById("sidebarOverlay");
+
+  if (!sidebar || !openBtn) return;
+
+  const openSidebar  = () => { sidebar.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; };
+  const closeSidebar = () => { sidebar.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; };
+
+  openBtn.addEventListener("click", openSidebar);
+  closeBtn?.addEventListener("click", closeSidebar);
+  overlay?.addEventListener("click", closeSidebar);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && sidebar.classList.contains("open")) closeSidebar(); });
 }
 
 // ===== BOOKING =====
@@ -419,35 +501,23 @@ function initBooking() {
   const modalClose = document.getElementById("modalClose");
   const modalRef = document.getElementById("modalRef");
 
-  // Set min date to today
   const dateInput = document.getElementById("bDate");
-  if (dateInput) {
-    const today = new Date().toISOString().split("T")[0];
-    dateInput.min = today;
-  }
+  if (dateInput) { const today = new Date().toISOString().split("T")[0]; dateInput.min = today; }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const btn = document.getElementById("bookBtn");
 
-    const name = document.getElementById("bName").value.trim();
-    const phone = document.getElementById("bPhone").value.trim();
+    const name    = document.getElementById("bName").value.trim();
+    const phone   = document.getElementById("bPhone").value.trim();
     const service = document.getElementById("bService").value;
-    const date = document.getElementById("bDate").value;
-    const time = document.getElementById("bTime").value;
-    const email = document.getElementById("bEmail").value.trim();
-    const notes = document.getElementById("bNotes").value.trim();
+    const date    = document.getElementById("bDate").value;
+    const time    = document.getElementById("bTime").value;
+    const email   = document.getElementById("bEmail").value.trim();
+    const notes   = document.getElementById("bNotes").value.trim();
 
-    if (!name || !phone || !service || !date || !time) {
-      showToast("Please fill in all required fields", "error");
-      return;
-    }
-
-    // FIX: basic phone validation
-    if (phone.replace(/\D/g, "").length < 10) {
-      showToast("Please enter a valid phone number", "error");
-      return;
-    }
+    if (!name || !phone || !service || !date || !time) { showToast("Please fill in all required fields", "error"); return; }
+    if (phone.replace(/\D/g, "").length < 10) { showToast("Please enter a valid phone number", "error"); return; }
 
     btn.disabled = true;
     btn.innerHTML = "<span>Processing...</span>";
@@ -467,7 +537,6 @@ function initBooking() {
         }
         await addDoc(collection(db, "appointments"), { ...appointment, createdAt: serverTimestamp() });
       } else {
-        // Demo mode — simulate async
         await new Promise(r => setTimeout(r, 1200));
       }
 
@@ -486,19 +555,15 @@ function initBooking() {
 
   modalClose.addEventListener("click", () => modal.classList.remove("open"));
   modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
-
-  // FIX: Escape closes booking modal
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && modal.classList.contains("open")) modal.classList.remove("open");
-  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("open")) modal.classList.remove("open"); });
 }
 
 // ===== TESTIMONIALS =====
 function renderTestimonials() {
   const slider = document.getElementById("testiSlider");
-  const dots = document.getElementById("testiDots");
+  const dots   = document.getElementById("testiDots");
 
-  slider.innerHTML = TESTIMONIALS.map((t, i) => `
+  slider.innerHTML = TESTIMONIALS.map((t) => `
     <div class="testi-card" role="listitem" aria-label="Testimonial from ${t.name}">
       <div class="testi-stars" aria-label="${t.stars} out of 5 stars">${"★".repeat(t.stars)}</div>
       <p class="testi-text">"${t.text}"</p>
@@ -522,7 +587,6 @@ function renderTestimonials() {
 
   startTestiAutoplay();
 
-  // Touch/drag support
   let startX = 0;
   slider.addEventListener("touchstart", e => { startX = e.touches[0].clientX; }, { passive: true });
   slider.addEventListener("touchend", e => {
@@ -533,9 +597,8 @@ function renderTestimonials() {
 
 function goToTesti(i) {
   testiIndex = (i + TESTIMONIALS.length) % TESTIMONIALS.length;
-  // FIX: card width calculation — use getBoundingClientRect for accuracy instead of offsetWidth
   const card = document.querySelector(".testi-card");
-  const gap = 24; // 1.5rem gap
+  const gap = 24;
   const cardWidth = card ? (card.getBoundingClientRect().width + gap) : (380 + gap);
   document.getElementById("testiSlider").style.transform = `translateX(-${testiIndex * cardWidth}px)`;
   document.querySelectorAll(".testi-dot").forEach((d, idx) => {
@@ -550,19 +613,13 @@ function prevTesti() { goToTesti(testiIndex - 1); }
 function startTestiAutoplay() {
   clearInterval(testiAutoplay);
   testiAutoplay = setInterval(nextTesti, 4500);
-
   const sliderEl = document.getElementById("testiSlider");
-
-  // FIX: remove previous event listeners before adding new ones to prevent accumulation
-  // Each call to startTestiAutoplay was adding duplicate mouseenter/mouseleave handlers
   if (testiMouseEnterHandler) {
     sliderEl.removeEventListener("mouseenter", testiMouseEnterHandler);
     sliderEl.removeEventListener("mouseleave", testiMouseLeaveHandler);
   }
-
   testiMouseEnterHandler = () => clearInterval(testiAutoplay);
   testiMouseLeaveHandler = startTestiAutoplay;
-
   sliderEl.addEventListener("mouseenter", testiMouseEnterHandler);
   sliderEl.addEventListener("mouseleave", testiMouseLeaveHandler);
 }
@@ -572,17 +629,15 @@ function renderGallery() {
   const grid = document.getElementById("galleryGrid");
   grid.innerHTML = GALLERY_ITEMS.map((item) => `
     <div class="gallery-item reveal ${item.tall ? "tall" : ""} ${item.wide ? "wide" : ""}" role="img" aria-label="${item.label} — ${item.tag}">
-      <div class="gallery-ph-icon" aria-hidden="true">${item.emoji}</div>
+      <div class="gallery-ph-icon" aria-hidden="true"><i class="${item.icon}"></i></div>
       <p class="gallery-ph-text">${item.tag}</p>
-      <div class="gallery-overlay" aria-hidden="true">
-        <span>${item.label}</span>
-      </div>
+      <div class="gallery-overlay" aria-hidden="true"><span>${item.label}</span></div>
     </div>
   `).join("");
   initReveal();
 }
 
-// ===== CONTACT FORM =====
+// ===== CONTACT =====
 function initContact() {
   const form = document.getElementById("contactForm");
   form.addEventListener("submit", (e) => {
@@ -595,7 +650,7 @@ function initContact() {
 // ===== SEARCH =====
 function initSearch() {
   const input = document.getElementById("productSearch");
-  // FIX: debounce search to avoid excessive re-renders while typing
+  if (!input) return;
   let searchTimer;
   input.addEventListener("input", () => {
     clearTimeout(searchTimer);
@@ -610,10 +665,7 @@ function initSmoothScroll() {
       const id = a.getAttribute("href").slice(1);
       if (!id) return;
       const el = document.getElementById(id);
-      if (el) {
-        e.preventDefault();
-        el.scrollIntoView({ behavior: "smooth" });
-      }
+      if (el) { e.preventDefault(); el.scrollIntoView({ behavior: "smooth" }); }
     });
   });
 }
@@ -630,28 +682,23 @@ function initCardReveals() {
       }
     });
   }, { threshold: 0.05 });
-  document.querySelectorAll(".services-grid, .products-grid, .gallery-grid").forEach(g => obs.observe(g));
+  document.querySelectorAll(".services-grid, .products-grid, .gallery-grid, .featured-products-grid").forEach(g => obs.observe(g));
 }
 
-// FIX: recalculate testimonial position on window resize (layout changes break translate offset)
 function initResizeHandler() {
   let resizeTimer;
   window.addEventListener("resize", () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-      goToTesti(testiIndex);
-    }, 200);
+    resizeTimer = setTimeout(() => { goToTesti(testiIndex); }, 200);
   }, { passive: true });
 }
 
 // ===== INIT =====
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   initLoader();
   initNavbar();
   initReveal();
   renderServices();
-  renderFilters();
-  renderProducts();
   initCart();
   initBooking();
   renderTestimonials();
@@ -661,4 +708,16 @@ document.addEventListener("DOMContentLoaded", () => {
   initSmoothScroll();
   initCardReveals();
   initResizeHandler();
+  initSidebar();
+
+  // Load products: try Firebase first, fall back to demo only if Firebase has no products
+  const fromFirebase = await loadProductsFromFirebase();
+  if (!fromFirebase) {
+    PRODUCTS = DEMO_PRODUCTS;
+  }
+
+  renderFilters();
+  renderProducts();
+  renderFeaturedProducts();
+  renderSidebarProducts();
 });
