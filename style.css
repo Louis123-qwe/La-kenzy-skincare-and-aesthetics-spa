@@ -1613,6 +1613,20 @@ section, .container, .nav-container, footer, .footer-top, .footer-bottom {
   flex-wrap: wrap;
 }
 
+.logo-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 10px rgba(212,175,55,0.3);
+  flex-shrink: 0;
+}
+.logo-img.small {
+  width: 36px;
+  height: 36px;
+}
+
 .qty-selector button { width: 22px !important; height: 22px !important; font-size: 0.75rem !important; }
 .qty-selector span { font-size: 0.75rem !important; min-width: 18px !important; }
 .add-cart-btn { font-size: 0.7rem !important; padding: 0.3rem 0.6rem !important; }
